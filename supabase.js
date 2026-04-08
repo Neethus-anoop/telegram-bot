@@ -1,9 +1,13 @@
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing SUPABASE_URL or SUPABASE_KEY environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function saveMessage(userId, message) {
   const { data, error } = await supabase
@@ -11,24 +15,30 @@ async function saveMessage(userId, message) {
     .insert([{ user_id: userId, message }]);
 
   if (error) {
-    console.log("Error:", error);
-  } else {
-    console.log("Saved:", data);
+    console.error('Supabase saveMessage error:', error);
+    throw error;
   }
+
+  console.log('Supabase saved message:', data);
+  return data;
 }
 
 async function searchMessage(text) {
+  if (!text) {
+    return [];
+  }
+
   const { data, error } = await supabase
     .from('messages')
     .select('*')
     .ilike('message', `%${text}%`);
 
   if (error) {
-    console.log("Search Error:", error);
+    console.error('Supabase searchMessage error:', error);
     return [];
   }
 
-  return data;
+  return data || [];
 }
 
 module.exports = { saveMessage, searchMessage };

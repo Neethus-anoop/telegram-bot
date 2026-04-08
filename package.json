@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "dependencies": {
     "@supabase/supabase-js": "^2.101.1",
+    "googleapis": "^131.0.0",
     "node-telegram-bot-api": "^0.67.0"
+  },
+  "scripts": {
+    "vercel-build": "echo \"No build step required\"",
+    "setup-webhook": "node scripts/set-webhook.js"
   }
 }
